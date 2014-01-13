@@ -25,7 +25,7 @@ def create_point(iduser, db, row):
 def create_label(iduser, db, row):
 	sql = "INSERT INTO LABEL (iduser,starttime,endtime,mode) VALUES ('%d','%s','%s','%s')" % (int(iduser),row[0].replace('/','-',3),row[1].replace('/','-',3),row[2])
 	try:
-		db.cursor().execute(sql)
+		error = db.cursor().execute(sql)
 		db.commmit()
 	except:
 		db.rollback()
@@ -42,7 +42,7 @@ for dossier in dossiers:
 	print "User "+str(cpt)+"/"+str(len(dossiers))
 	cpt += 1
 	print "Dossier : "+dossier
-	create_user(dossier,db)
+	#create_user(dossier,db)
 
 	onlyfiles = [f for f in listdir("./"+dossier) if isfile(join("./"+dossier,f))]
 	if(len(onlyfiles) == 1):
@@ -73,7 +73,7 @@ for dossier in dossiers:
 				compteur += 1 
 			else:
 				tuple = line.rstrip('\n\r').split(",")
-				create_point(dossier,db, tuple)
+				#create_point(dossier,db, tuple)
 		contenu.close()
 
 
