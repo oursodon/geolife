@@ -1,3 +1,7 @@
+import MySQLdb
+from os import listdir
+from os.path import isfile, join
+
 def connect_db():
 	#MySQLdb.connect("host","user","psswd","base")
 	db = MySQLdb.connect("localhost","root","truc","geolife")
@@ -7,32 +11,36 @@ def close_db(db):
 	db.close()
 
 def create_user(iduser, db):
+	sql = "INSERT INTO USER (id) VALUES ('%d')" % (int(iduser))
+	#print sql
 	try:
-		db.cursor().execute("INSERT INTO USER (id) VALUES ('%d')" % (int(iduser)))
+		db.cursor().execute(sql)
 		db.commit()
-	except:
+	except Exception, e:
+		print e
 		db.rollback()
 
 def create_point(iduser, db, row):
 	sql = "INSERT INTO POINT (iduser,latitude,longitude,altitude,date) VALUES ('%d','%f','%f','%f','%s')" % \
 (int(iduser),float(row[0]),float(row[1]),float(row[3]),row[5]+" "+row[6])
+	#print sql
 	try:
 		db.cursor().execute(sql)
 		db.commit()
-	except:
+	except Exception, e:
+		print e
 		db.rollback()
 
 def create_label(iduser, db, row):
 	sql = "INSERT INTO LABEL (iduser,starttime,endtime,mode) VALUES ('%d','%s','%s','%s')" % (int(iduser),row[0].replace('/','-',3),row[1].replace('/','-',3),row[2])
+	#print sql
 	try:
 		error = db.cursor().execute(sql)
 		db.commmit()
-	except:
+	except Exception, e:
+		print e
 		db.rollback()
 
-import MySQLdb
-from os import listdir
-from os.path import isfile, join
 
 dossiers = listdir(".")
 db = connect_db()
@@ -42,7 +50,7 @@ for dossier in dossiers:
 	print "User "+str(cpt)+"/"+str(len(dossiers))
 	cpt += 1
 	print "Dossier : "+dossier
-	#create_user(dossier,db)
+	create_user(dossier,db)
 
 	onlyfiles = [f for f in listdir("./"+dossier) if isfile(join("./"+dossier,f))]
 	if(len(onlyfiles) == 1):
@@ -63,6 +71,8 @@ for dossier in dossiers:
 	
 	nbfichiers = len(fichiers)
 	cptfichier = 1
+
+	#Parsage des fichiers contenant les points GPS
 	for fichier in fichiers:
 		print "Parsage fichiers points ("+str(cptfichier)+"/"+str(nbfichiers)+")"
 		contenu = open(chemin+fichier,"r")
@@ -73,7 +83,7 @@ for dossier in dossiers:
 				compteur += 1 
 			else:
 				tuple = line.rstrip('\n\r').split(",")
-				#create_point(dossier,db, tuple)
+				create_point(dossier,db, tuple)
 		contenu.close()
 
 
